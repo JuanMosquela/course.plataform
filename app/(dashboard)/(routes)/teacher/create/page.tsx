@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -18,12 +18,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   title: z.string().min(3, { message: "Ttitle is required" }),
 });
 
 const page = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,7 +35,17 @@ const page = () => {
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {};
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const { data } = await axios.post("/api/courses", values);
+
+      router.push(`/teacher/courses/${data.course.id}`);
+      toast.success(`${data.message}`);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed created course");
+    }
+  };
 
   return (
     <div className="max-w-5xl mx-auto md:justify-center h-full p-6">
