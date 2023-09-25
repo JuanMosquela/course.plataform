@@ -3,16 +3,16 @@ import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
 
 export async function PATCH(
-  request: Request,
+  req: Request,
   { params }: { params: { courseId: string } }
 ) {
   try {
     const { userId } = auth();
     const { courseId } = params;
-    const values = await request.json();
+    const values = await req.json();
 
     if (!userId) {
-      return new NextResponse("Unauthorized user", { status: 401 });
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const course = await db.course.update({
@@ -25,11 +25,9 @@ export async function PATCH(
       },
     });
 
-    return NextResponse.json(
-      { message: "Course updated successfully", course },
-      { status: 200 }
-    );
+    return NextResponse.json(course);
   } catch (error) {
-    return new NextResponse("Internal server error", { status: 500 });
+    console.log("[COURSE_ID]", error);
+    return new NextResponse("Internal Error", { status: 500 });
   }
 }

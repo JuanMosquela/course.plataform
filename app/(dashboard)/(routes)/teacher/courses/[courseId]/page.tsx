@@ -5,6 +5,9 @@ import { IconBadge } from "@/components/icon-badge";
 import { LayoutDashboard } from "lucide-react";
 import TitleForm from "@/components/TitleForm";
 import { auth } from "@clerk/nextjs";
+import DescriptionForm from "@/components/DescriptionForm";
+import { ImageForm } from "@/components/ImageForm";
+
 const page = async ({ params }: { params: { courseId: string } }) => {
   const { courseId } = params;
   const { userId } = auth();
@@ -50,6 +53,8 @@ const page = async ({ params }: { params: { courseId: string } }) => {
             <h2 className="text-xl">Customize your course</h2>
           </div>
           <TitleForm initialData={course} courseId={courseId} />
+          <DescriptionForm initialData={course} courseId={courseId} />
+          <ImageForm initialData={course} courseId={courseId} />
         </div>
       </div>
     </section>
