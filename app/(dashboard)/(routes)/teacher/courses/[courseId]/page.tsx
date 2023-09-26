@@ -2,21 +2,48 @@ import React from "react";
 import { db } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { IconBadge } from "@/components/icon-badge";
-import { LayoutDashboard } from "lucide-react";
+import {
+  CircleDollarSign,
+  DollarSign,
+  File,
+  LayoutDashboard,
+  ListChecks,
+} from "lucide-react";
 import TitleForm from "@/components/TitleForm";
 import { auth } from "@clerk/nextjs";
 import DescriptionForm from "@/components/DescriptionForm";
 import { ImageForm } from "@/components/ImageForm";
+import { Combobox } from "@/components/ui/combobox";
+import CategoriesForm from "@/components/CategoriesForm";
+import PriceForm from "@/components/PriceForm";
+import { AttachmentForm } from "@/components/AttachmentForm";
 
 const page = async ({ params }: { params: { courseId: string } }) => {
   const { courseId } = params;
   const { userId } = auth();
 
-  const course = await db.course.findUnique({
+  const courseData = db.course.findUnique({
     where: {
       id: courseId,
     },
+    include: {
+      attachments: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
+    },
   });
+
+  const categoriesData = db.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  const [course, categories] = await Promise.all([courseData, categoriesData]);
+
+  console.log("info de cat4egories:", categories);
 
   if (!course) {
     return redirect("/");
@@ -27,7 +54,7 @@ const page = async ({ params }: { params: { courseId: string } }) => {
   const fields = [
     course.title,
     course.price,
-    course.image,
+    course.imageUrl,
     course.description,
     course.categoryId,
   ];
@@ -55,6 +82,35 @@ const page = async ({ params }: { params: { courseId: string } }) => {
           <TitleForm initialData={course} courseId={courseId} />
           <DescriptionForm initialData={course} courseId={courseId} />
           <ImageForm initialData={course} courseId={courseId} />
+          <CategoriesForm
+            initialData={course}
+            courseId={courseId}
+            options={categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            }))}
+          />
+        </div>
+        <div className="space-y-6">
+          <div className="flex items-center gap-x-2">
+            <IconBadge icon={ListChecks} />
+            <h2 className="text-xl">Course Chapters</h2>
+          </div>
+          <div>Chapters</div>
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={CircleDollarSign} />
+              <h2 className="text-xl">Price your course</h2>
+            </div>
+            <PriceForm initialData={course} courseId={courseId} />
+          </div>
+          <div>
+            <div className="flex items-center gap-x-2">
+              <IconBadge icon={File} />
+              <h2 className="text-xl">Resources & Attachments</h2>
+            </div>
+            <AttachmentForm initialData={course} courseId={course.id} />
+          </div>
         </div>
       </div>
     </section>
