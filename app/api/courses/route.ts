@@ -4,24 +4,26 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { userId } = auth();
     const { title } = await request.json();
+    const { userId } = auth();
 
     if (!userId) {
-      return new NextResponse("Unahotorized", { status: 401 });
+      return new NextResponse("Unauthorized");
     }
 
     const course = await db.course.create({
       data: {
-        userId,
         title,
+        userId,
       },
     });
 
-    return NextResponse.json(
-      { message: "Course created successfully", course },
-      { status: 200 }
-    );
+    if (course) {
+      return NextResponse.json(
+        { message: "Course created", course },
+        { status: 200 }
+      );
+    }
   } catch (error) {
     console.log("[COURSES]", error);
     return new NextResponse("Internal server error", { status: 500 });
