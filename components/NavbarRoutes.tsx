@@ -12,7 +12,9 @@ const NavbarRoutes = () => {
 
   const isTeacherPage = pathname?.startsWith("/teacher");
   const isPlayerPage = pathname?.startsWith("/chapter");
-   const isSearchPage = pathname === "/search";
+  const isSearchPage = pathname === "/search";
+
+  
 
   return (
  <>

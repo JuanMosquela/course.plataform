@@ -24,7 +24,7 @@ const formSchema = z.object({
   title: z.string().min(3, { message: "Ttitle is required" }),
 });
 
-const page = () => {
+const CreatePage = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,4 +97,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default CreatePage;

@@ -2,8 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 
 const database = new PrismaClient();
 
+
+
 const main = async () => {
   try {
+
     await database.category.createMany({
       data: [
         { name: "Computer Science" },
